@@ -1,0 +1,177 @@
+Spring Plus 4
+
+
+# Index
+
+Full Table Scan <-> Index Scan
+
+
+빠르게 찾을 수 있다.
+총 데이터가 수십만 건이어도 속도는 크게 느려지지 않는다.
+대신 색인표를 관리
+
+
+
+✅ 인덱스의 역할 한 줄 정의
+ 
+인덱스는 데이터를 빠르게 찾기 위한 ‘검색용 지도’
+
+| 항목       | 내용                               |
+| -------- | -------------------------------- |
+| 기본 역할    | 원하는 데이터를 빠르게 찾도록 도와줌             |
+| 저장 위치    | 테이블과 별도의 자료 구조로 관리               |
+| 구조 형태    | B-Tree 알고리즘 사용                   |
+| 자동 생성 예시 | `PRIMARY KEY`, `UNIQUE` 제약 조건 컬럼 |
+
+
+
+
+✅ 인덱스 적용 전후 비교
+ 
+| 구분              | 인덱스 없음                | 인덱스 있음     |
+| --------------- | --------------------- | ---------- |
+| 검색 방식           | 전체 테이블 탐색 (Full Scan) | 정렬된 인덱스 탐색 |
+| 속도              | O(n)                  | O(log n)   |
+| I/O 비용          | 매우 높음                 | 낮음         |
+| 추가 공간           | 없음                    | 필요         |
+| INSERT / UPDATE | 빠름                    | 약간 느림      |
+
+
+---
+
+
+>
+```
+CREATE TABLE user (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(50),
+  age INT
+);
+
+// 천만건 데이터 생성
+INSERT INTO user (name, age)
+SELECT 
+  CONCAT('user', 
+         n1.a + n2.a*10 + n3.a*100 + n4.a*1000 + n5.a*10000 + n6.a*100000 + n7.a*1000000 + 1),
+  FLOOR(RAND() * 100)
+FROM 
+  (SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n1,
+  (SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n2,
+  (SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n3,
+  (SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n4,
+  (SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n5,
+  (SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n6,
+  (SELECT 0 a UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+   UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) n7;
+
+SELECT COUNT(*) FROM user;
+
+SELECT * FROM user WHERE name = 'user5000';
+
+CREATE INDEX idx_user_name ON user(name);
+SELECT * FROM user WHERE name = 'user5000';
+```
+
+
+---
+
+
+✅ 인덱스는 단순한 “정렬표”가 아니다
+ 
+인덱스는 단순히 가나다순 정렬이 아니라, 검색을 위한 트리(Tree) 구조의 탐색 지도
+
+도서관의 “ㄱ~ㅎ” 순서만 있는 색인표
+정렬만 되어 있음 (단순 정렬)
+
+인덱스의 “B-Tree 구조”
+분기(branch)를 따라 빠르게 탐색 가능 (트리 탐색)
+
+인덱스는 단순히 정렬된 목록이 아니라, 데이터를 분할·정렬·균형 유지하는 탐색 트리
+
+
+---
+
+✅ B-Tree 구조 시각화
+ 
+데이터가 저장되는 형태
+
+>
+```
+-
+배열구조
+-
+Index:   0     1     2     3     4
+Value:  [10]  [20]  [30]  [40]  [50]
+-
+--------------------------------------
+-
+트리 구조 
+-
+              [50]
+             /    \
+         [20]      [70]
+        /   \      /   \
+     [10]  [30]  [60] [80]
+-
+```
+
+
+### 탐색 과정 이해 (WHERE id = 60)
+
+1. 루트 노드 [50]에서 비교
+→ 60 > 50 → 오른쪽으로 이동
+
+2. 오른쪽 자식 노드 [70] 도착
+→ 60 < 70 → 왼쪽으로 이동
+
+3. 왼쪽 자식 [60] 도착
+데이터 주소를 통해 실제 레코드 접근
+ 
+✅ 단 3단계 만에 원하는 데이터 위치 탐색 성공!
+➡️ 불필요한 탐색 없이 트리 높이(log n) 만큼의 단계만 수행
+Full Scan 대비 수백~수천 배 빠름
+
+
+---
+
+1️⃣ Unique Scan
+
+2️⃣ Range Scan
+
+3️⃣ Full Index Scan
+
+4️⃣ Index Condition Pushdown (ICP)
+
+5️⃣ Table Full Scan
+
+
+
+### ✅ 인덱스의 한계
+
+
+1. 자주 갱신되는 컬럼엔 비효율적
+트리 구조 재정렬 필요 (삽입·삭제 시마다 트리 균형 재조정)
+
+2. 너무 많은 인덱스는 오히려 성능 저하
+쓰기 시 모든 인덱스를 업데이트해야 함
+
+3. 메모리 공간 소모
+인덱스도 결국 별도의 파일 구조로 저장됨 (수 GB 이상 가능)
+
+
+
+
+
+
+
+
+
+
+
+

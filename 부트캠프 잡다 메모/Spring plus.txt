@@ -1,0 +1,572 @@
+Spring plus
+
+
+1. JPQL
+- JPA에서 사용하는 문자열 기반 쿼리
+- 문자열 기반이다보니 IDE의 자동완성 기능이나 리펙토링이 불가능
+- 오타/필드 변경 시 빨간줄이 안떠서 실행해야 그제서야 오류를 발견
+- 동적 쿼리 작성 시 가독성이 떨어져서 유지보수가 어려움
+
+
+2. QueryDSL
+- JPQL을 안전하게 작성하기 위해 나타난 라이브러리
+- JPQL 비더이자 도메인 전용 언어
+- 어디까지나 JPA 위에서 도작하는 쿼리 빌더라서, SQL이 아님
+
+- 위에서 언급한 단점들을 보완해줌
+-> IDE 자동완성 지원, 컴파일 타임 검증, 동적 쿼리 작성 간결화, 가독성/유지보수성 향상
+
+
+3. QueryDSL 설정
+
+### 1. build.gradle에 추가
+
+>
+```java
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+```
+
+- 3.x 버전 스프링부트 기준이므로 jakarta.persistence
+-> 2.x 버전은 javax.persistence
+
+### 2. QuerydslConfig 설정
+
+>
+```
+@Configuration
+public class QuerydslConfig {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    @Bean
+    public JPAQueryFactory jpaQueryFactory() {
+        return new JPAQueryFactory(em);
+    }
+}
+```
+
+- 그레들 설정과 QuerydslConfig 설정을 하면
+-> Q-Type 클래스가 생성됨
+
+
+4. Q-Type 이해하기
+
+QueryDSL은 빌드 시 자동으로 Q타입 클래스 (querydsl 전용 클래스)를 생성
+ex) 기존 User엔티티 클래스로부터 -> QUser가 생성
+
+- 📌 Q클래스 생성 위치 확인
+build → classes→java.main.Entity를 생성한 패키지 위치 → QClass
+
+
+머리에 넣고 시작...
+>
+```java
+[우리 코드]
+   ↓
+[Spring 컨테이너] - 객체를 대신 만들어주고 관리해주는 관리자
+   ↓
+[JPA 구현체(Hibernate)] 
+   ↓
+[EntityManager] - JPA에서 제공하는 핵심 인터페이스, 영속성 컨텍스트를 조종
+   ↓
+[영속성 컨텍스트] - 엔티티를 관리하는 “메모리 공간”, 상태 관리자
+   ↓
+[DB]
+```
+
+
+실제 실행 흐름 (요청 1건 기준)
+>
+```java
+HTTP 요청
+ ↓
+Controller
+ ↓
+Service (@Transactional)
+ ↓
+EntityManager (주입됨)
+ ↓
+Persistence Context
+ ↓
+Hibernate
+ ↓
+JDBC
+ ↓
+DB
+```
+
+---
+@PersistenceContext는
+트랜잭션 스코프에 맞는 EntityManager를 컨테이너가 관리해서 주입해주는
+JPA 표준 어노테이션
+
+@Bean 한 줄 정의
+Spring 컨테이너에게
+“이 메서드의 반환값을 객체(Bean)로 관리해라” 라고 등록하는 어노테이션
+@Bean은 **“이 객체를 Spring이 관리하게 만들겠다”**는 선언이고,
+그 순간부터 의존성 주입, 싱글톤, 트랜잭션 관리의 대상이 된다.
+---
+
+
+---
+
+## QueryDSL 구조
+
+### 기본 구조
+
+>
+```java
+queryFactory
+    .select(조회대상)
+    .from(대상엔티티)
+    .where(조건)
+    .orderBy(정렬)
+    .fetch();(실행)
+```
+
+### 적용
+>
+```java
+@RequiredArgsConstructor
+public class PostCustomRepositoryImpl implements PostCustomRepository {
+-
+    private final JPAQueryFactory queryFactory;
+-
+    @Override
+    public List<PostSummaryDto> findPostSummary(String username) {
+        return queryFactory
+                .select(Projections.constructor(
+                        PostSummaryDto.class,
+                        post.content,
+                        comment.countDistinct().intValue()
+                ))
+                .from(post)
+                .leftJoin(post.comments, comment)
+                .where(post.user.username.eq(username))
+                .groupBy(post.id)
+                .fetch();
+    }
+```
+
+## Q타입 클래스
+
+- 스샷 첨부
+
+
+## QueryDSL의 메서드
+
+표로 정리해서 올리기 (eq, ne 등)
+
+#### fetch
+fetch()는 결과 리스트를 반환하며,
+fetchOne(), fetchFirst()로 단건 조회도 가능하다. (단, 결과가 둘 이상이면 예외 발생)
+
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+
+
+✅ 동적 쿼리
+
+동적 쿼리(Dynamic Query)란?
+
+사용자가 입력한 검색 조건에 따라 쿼리를 유연하게 생성하는 방식
+예를 들어,
+이름만 입력하면 이름으로 검색
+이메일만 입력하면 이메일로 검색
+둘 다 입력하면 둘 다 조건으로 검색
+ 
+이런 형태를 지원하기 위해 QueryDSL에서는 BooleanBuilder나 BooleanExpression 조건을 활용
+
+
+
+✅ 동적 쿼리가 필요한 이유
+기존 방식의 한계
+Spring Data JPA의 기본 메서드만으로는 아래 같은 검색을 표현하기 어렵습니다.
+예시:
+사용자 이름(username)이 “앨리스”인 사람
+또는 이메일(email)에 “gmail”이 포함된 사람
+그리고 역할(role)이 NORMAL인 경우
+
+
+❌ 기존 방식 (메서드 이름 기반)
+
+List<User> findByUsernameAndEmailContainsAndRoleEnum(
+    String username, String email, UserRoleEnum roleEnum
+);
+
+조건이 조금만 바뀌어도 메서드가 폭발적으로 늘어남
+→ findByUsernameAndRoleEnum
+→ findByEmailContains
+→ findByUsernameOrEmailContainsAndRoleEnum …
+➡ 유지보수가 불가능
+
+
+❌ 기존 방식 (if문 조합)
+
+if (username != null && email != null) {
+    return userRepository.findByUsernameAndEmail(username, email);
+} else if (username != null) {
+    return userRepository.findByUsername(username);
+} else if (email != null) {
+    return userRepository.findByEmail(email);
+}
+
+코드가 중복되고, 분기문이 늘어남.
+조건이 늘어날수록 복잡도가 기하급수적으로 증가.
+수정할 때마다 쿼리 로직을 직접 손대야 함.
+
+
+
+
+✅ BooleanBuilder vs BooleanExpression
+ 
+QueryDSL에서 동적 쿼리를 작성할 때 사용하는 대표적인 두 가지 방법입니다.
+둘 다 조건(where 절)을 표현하지만 역할과 사용 시점이 다릅니다.
+
+
+🗣BooleanBuilder란?
+여러 조건을 동적으로 추가하거나 제거할 수 있는 “가변 조건 컨테이너” 입니다.
+➡️ 조건을 하나씩 쌓아가며 만드는 방식으로, 복잡한 검색 조건에 유용합니다.
+
+
+BooleanBuilder builder = new BooleanBuilder();
+
+if (username != null) {
+    builder.and(user.username.contains(username));
+}
+if (email != null) {
+    builder.and(user.email.contains(email));
+}
+if (role != null) {
+    builder.and(user.roleEnum.eq(role));
+}
+
+List<User> result = queryFactory
+        .selectFrom(user)
+        .where(builder)
+        .fetch();
+
+
+null 처리 - 직접 if문 작성
+조립 방식 - .and(), .or()로 조건 누적
+장점 - 조건을 순차적으로 추가/삭제 가능
+단점 - 코드가 길어지고 재사용 어려움
+
+
+🗣BooleanExpression이란?
+하나의 조건(표현식)을 메서드로 정의해 조합하는 불변 표현식입니다.
+➡️ null 조건은 QueryDSL이 자동으로 무시하므로 코드가 깔끔해집니다.
+
+
+private BooleanExpression usernameContains(String username) {
+    return username != null ? user.username.contains(username) : null;
+}
+
+private BooleanExpression emailContains(String email) {
+    return email != null ? user.email.contains(email) : null;
+}
+
+private BooleanExpression roleEq(UserRoleEnum role) {
+    return role != null ? user.roleEnum.eq(role) : null;
+}
+
+List<User> result = queryFactory
+        .selectFrom(user)
+        .where(
+            usernameContains(cond.getUsername()),
+            emailContains(cond.getEmail()),
+            roleEq(cond.getRole())
+        )
+        .fetch();
+
+
+null 처리 - 자동 무시
+조립 방식 - 메서드 간 병합 (.and(), .or())
+장점 - 코드 재사용성 높고 구조가 깔끔
+단점 - builder처럼 즉석 추가는 불가
+
+
+두 방식 비교 요약
+스샷 첨부
+
+
+언제 어떤 걸 써야 할까?
+
+조건이 많고, 일부 조건을 동적으로 추가/삭제해야 할 때
+BooleanBuilder
+유연한 조건 추가 가능
+조건이 고정되어 있고, null만 무시하면 될 때
+BooleanExpression
+코드가 간결하고 재사용성 높음
+
+
+## BooleanBuilder/BooleanExpression 실습
+스샷 찍고 첨부
+
+
+프로젝션 개념 복기
+
+
+-----------------------------------------------------------------------------------------------
+
+
+1️⃣ JPA에서 연관관계를 사용하는 이유
+
+JPA는 “객체와 테이블을 1:1로 매핑”하는 ORM
+
+즉, 객체 그래프 탐색이 가능하도록 엔티티 간 연결이 필요
+
+
+```java
+@Entity
+public class Post {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+}
+```
+
+➡ 이렇게 하면 아래 코드가 가능
+
+```java
+post.getUser().getUsername();
+```
+
+💡 개발자가 SQL을 직접 작성하지 않아도,
+객체 참조(post.user.username)만으로 관계를 탐색 가능
+즉,
+“연관관계는 쿼리를 자동으로 만들어주는 편리함 때문에 필요하다.”
+하지만, 이 편리함이 바로 JPA의 가장 큰 단점
+
+
+2️⃣ JPA 연관관계가 만들어내는 문제들
+
+N+1 문제
+연관 객체를 탐색할 때 쿼리가 N번 추가로 실행됨
+Lazy/Eager 로딩 충돌
+서비스마다 로딩 전략이 달라 일관성 유지 어려움
+순환 참조
+양방향 매핑 시 직렬화 무한 루프 (ex. JSON 변환 시)
+쿼리 제어 불가능
+JPA가 내부적으로 어떤 SQL을 날릴지 알기 어려움
+성능 튜닝 제한
+fetch join, batch size 등으로 “임시 해결”만 가능
+
+
+3️⃣ JPA가 불편하지만 써야하는 이유
+
+트랜잭션 관리
+JPA의 변경 감지(Dirty Checking) 및 Cascade 전파를 위해 필요
+객체 지향 모델
+엔티티 간 참조로 비즈니스 로직을 객체 중심으로 표현 가능
+일관된 도메인 상태 관리
+연관 엔티티 변경 시, 영속성 컨텍스트가 함께 동기화
+
+
+“JPA의 장점(객체 그래프 관리)”을 쓰기 위해
+연관관계라는 불편한 장치를 감수
+
+
+4️⃣ QueryDSL의 등장 - 쿼리를 다시 제어
+
+ueryDSL은 “타입 안전한 SQL Builder”입니다.
+즉, ORM의 내부 쿼리를 신뢰하지 않고
+개발자가 직접 SQL을 조립
+
+```java
+List<Post> result = queryFactory
+    .selectFrom(post)
+    .join(post.user, user)
+    .where(user.username.eq("김동현"))
+    .fetch();
+```
+
+JPA가 자동으로 만들어주던 쿼리를 개발자가 명시적으로 정의
+
+
+5️⃣ ID 기반 설계 - 연관관계 없는 엔티티
+
+이제 실무에서는 객체 간의 관계를 굳이 매핑X
+대신 단순한 외래키 필드(ID) 만 저장
+
+
+기존 방식
+
+```
+@Entity
+public class Post {
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
+}
+```
+
+
+실무형 방식
+
+```
+@Entity
+public class Post {
+    private Long userId; // 연관관계 대신 ID만 저장
+}
+```
+
+➡ 연관관계 제거 후, QueryDSL로 조인 시점에만 연결
+
+
+
+6️⃣ QueryDSL로 명시적 Join
+
+이제 Post와 User를 이렇게 조인
+
+```java
+List<PostResponse> result = queryFactory
+    .select(Projections.constructor(PostResponse.class,
+        post.content,
+        user.username))
+    .from(post)
+    .leftJoin(user).on(post.userId.eq(user.id)) // ID 기반 Join
+    .fetch();
+```
+
+💬 즉, “관계는 코드가 아니라 쿼리로 관리”하는 구조로 바뀐 것
+
+
+7️⃣ 그래서 생기는 변화를 정리하자면...
+
+표 스샷 첨부
+
+
+8️⃣ 결과적으로, 실무의 흐름은 이렇게 변화
+
+```
+[JPA 초기]
+    객체 중심 설계 → 연관관계 사용 (@OneToMany 등)
+        ↓
+[N+1, Lazy 문제 발생]
+    fetch join, batch size로 임시 해결
+        ↓
+[QueryDSL 도입]
+    개발자가 쿼리 직접 제어 가능
+        ↓
+[현재 실무 트렌드]
+    엔티티 간 연관관계 제거 → ID 기반 + 명시적 join(QueryDSL)
+```
+
+💡 “연관이 필요 없는것은 JPA가, 조인이 필요한 것은 QueryDSL이 한다.”
+
+
+9️⃣ 요약
+
+
+⚙️ JPA는 객체 그래프 탐색을 위해 연관관계를 사용했지만,
+QueryDSL이 등장하면서
+개발자가 직접 Join을 제어할 수 있게 되었다.
+따라서 실무에서는 연관관계를 제거하고
+ID 기반 설계 + 명시적 Join(QueryDSL) 으로 전환한다.
+ 
+불편한 것이 생기고 이를 개선하기 위해서 새로운 기술이 나오는 자연적인 흐름으로 진화한 것
+
+
+## 실습
+
+
+-----------------------------------------------------------------------------------------------
+
+✅ 도커 (컨테이너)
+
+Docker는 애플리케이션과 그 실행 환경을 하나로 묶어서, 어디서 실행하든 동일하게 동작하게 만들어주는 기술
+
+코드뿐 아니라 실행에 필요한 OS, 라이브러리, 설정까지 함께 묶음
+덕분에 “내 컴퓨터에서는 되는데?” 문제를 해결
+
+도커 = 실행 환경을 통째로 포장하는 기술
+
+
+
+✅ 그럼 예전에는 이런 걸 어떻게 했을까?
+
+💬 예전에는 가상머신(Virtual Machine)이라는 기술을 썼음
+OS 안에 또 다른 OS를 띄워서 완전히 분리된 환경을 만드는 방식
+실행은 가능했지만 무겁고 느리고 자원을 많이 사용
+ 
+📘 예시
+하나의 서버에 VM 3개를 띄우면, OS도 3개가 돌아가기 때문에
+CPU, RAM, 디스크가 훨씬 더 많이 소모
+
+
+
+✅ 컨테이너와 가상머신의 차이
+
+표 스샷 첨부
+
+컨테이너는 운영체제를 통째로 복제하지 않고, 공유하는 방식으로 동작
+
+가상머신: 컴퓨터 안에 또 다른 컴퓨터를 만듦
+컨테이너: 하나의 컴퓨터 안에서 앱만 따로 격리해서 실행
+
+
+
+✅ 도커 동작 원리
+
+💬 도커는 ‘이미지(Image)’를 실행해서 ‘컨테이너(Container)’를 만들어 동작
+🔹 1. 이미지(Image)
+실행 환경을 담고 있는 설계도
+(운영체제, 라이브러리, 코드, 설정 파일이 모두 포함됨)
+이 이미지를 Docker Hub(저장소)에서 내려받을 수 있음
+ 
+🔹 2. 컨테이너(Container)
+이미지를 실제로 실행한 결과물이자 실행 중인 인스턴스
+각 컨테이너는 독립된 공간에서 돌아가고, 다른 컨테이너와 격리되어 있음
+OS를 새로 띄우지 않고, 호스트 운영체제의 커널을 공유해 빠르게 실행
+
+
+포트 설명
+그림 스샷 첨부
+
+
+
+컨테이너 내부 접속 스샷 첨부
+
+
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+
+도커파일 생성
+
+도커 이미지 생성
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,323 @@
+Spring plus 캐시 3주차~
+
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+
+도커파일 생성
+
+도커 이미지 생성
+
+-----------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------
+
+캐시
+
+💡 “자주 사용하는 데이터를 더 빠른 저장소에 임시로 저장해 재사용하는 기술”
+DB나 외부 API 호출 없이 메모리(In-memory) 에서 즉시 응답 가능
+핵심 목적: 속도 향상, DB 부하 감소, 트래픽 절감
+
+
+캐시 기본 구조
+
+요청(Request)
+   ↓
+[ 캐시(Cache) ] → HIT → 빠른 응답
+   ↓
+MISS (없을 경우)
+   ↓
+[ DB ] → 데이터 조회 후 캐시에 저장
+
+
+💬 “처음에는 느리지만(캐시 미스), 다음부터는 빠르다(캐시 히트).”
+
+💡 DB는 ‘정확성 중심’, 캐시는 ‘속도 중심’.
+
+
+DB의 데이터를 늘 직접 가져오면 안정적이지만 느리고
+캐시를 자주 사용하면 응답 속도가 높고 DB 접근 횟수가 줄지마느 항상 최신 데이터임을 보장하진 않음
+
+
+실무에선 DB+캐시를 함께 사용
+
+
+
+반복적인 DB 조회 -> ✅ 캐시로 응답 속도 10~100배 향상
+외부 API 호출 지연 -> ✅ API 응답 캐시로 비용 절감
+트래픽 폭증 시 서버 부하 -> ✅ 캐시로 병목 완화
+인기 게시글/상품 조회 -> ✅ 캐시로 빠른 응답 제공
+
+
+표로 만들기
+✅ 캐시의 유형
+ 
+구분
+설명
+예시
+로컬 캐시(Local Cache)
+애플리케이션 내부 메모리에 저장
+ConcurrentHashMap, Caffeine
+분산 캐시(Distributed Cache)
+외부 서버에 저장해 여러 인스턴스가 공유
+Redis, Memcached
+
+
+💡 로컬 캐시는 빠르지만 서버 간 데이터 공유 불가능.
+분산 캐시는 느리지만 여러 서버에서 공유 가능한 캐시 구조.
+
+
+
+✅ 캐시 전략(Cache Strategy)
+ 
+표로 만들기
+전략
+설명
+특징
+Write-through
+DB에 쓰는 동시에 캐시도 갱신
+데이터 일관성 ↑
+Write-back
+캐시에 먼저 쓰고, 나중에 DB 반영
+속도 ↑, 위험도 ↑
+Cache-aside (Lazy Loading)
+요청 시 캐시 확인 → 없으면 DB 조회 후 캐시 저장
+가장 일반적
+Cache Invalidation
+데이터 변경 시 캐시 삭제 또는 갱신
+일관성 유지 핵심
+
+
+
+Cache-aside 전략 흐름
+
+
+```
+요청 → 캐시 확인
+   ↓
+  [없음] → DB 조회
+   ↓
+데이터 캐시에 저장 (TTL 설정)
+   ↓
+응답 반환
+```
+
+➡ 장점: 단순하고 범용적
+➡ 단점: 처음 요청(Cache Miss) 시는 느림
+
+
+
+✅ 캐시 일관성(Consistency) 이슈
+
+💣 “DB 값은 바뀌었는데, 캐시에는 옛날 값이 남아 있다.”
+
+캐시 TTL 너무 김 -> 오래된 데이터 계속 제공
+DB 업데이트 누락 -> 캐시만 갱신 안 됨
+
+💡 캐시의 가장 큰 기술적 과제는 “정확성 유지” 
+
+
+TTL(Time-To-Live) & Eviction Policy
+TTL (유효 기간) → 강제로 일정 주기로 캐시의 데이터 최신화
+
+
+
+Eviction Policy (삭제 정책)
+캐시가 꽉 찼을 때 어떤 데이터부터 지울지
+LRU: 최근 사용하지 않은 항목 제거
+LFU: 사용 빈도 낮은 항목 제거
+FIFO: 먼저 들어온 항목 제거
+
+
+캐싱 설계 시 주의점
+캐시는 항상 DB의 보조 수단이다.
+TTL은 너무 짧으면 캐시 효율이 떨어지고, 너무 길면 데이터 불일치 발생.
+변경이 잦은 데이터보다는 조회가 많은 데이터 중심으로 적용.
+캐시 Key 설계는 명확히:
+도메인명:ID, user:42, post:1001
+캐시 장애 대비: 캐시 장애 시 DB로 fallback 처리 필요.
+
+
+
+-----------------------------------------------------------------------------------------------
+
+
+로컬 캐시 - Spring Cache
+
+💡 Spring이 제공하는 캐싱 추상화(Cache Abstraction)
+→ 캐시 로직을 직접 작성하지 않고, 어노테이션 기반으로 처리할 수 있는 구조
+
+
+@Cacheable / @CacheEvict / @CachePut
+        ↓
+[ Cache Abstraction Layer ]
+        ↓
+CacheManager
+        ↓ 
+Cache (Caffeine, Redis 등)
+
+
+
+build.gradle
+
+// 스프링에서 캐시 사용할 것임
+implementation 'org.springframework.boot:spring-boot-starter-cache' 
+
+// 캐시는 로컬 캐시 : caffeine을 사용할 것임
+implementation 'com.github.ben-manes.caffeine:caffeine' 
+
+
+
+Application.java
+
+@SpringBootApplication
+@EnableCaching // 캐시 기능 활성화 -> 없으면 캐시 활성화 안됨
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+
+
+
+application.yml
+
+spring:
+  cache:
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=10s
+# 최대 100개 캐시 유지, 10초 후 만료
+# 이것 이외에도 정말 다양한 TTL & Eviction Policy 있으니 다양한 옵션을 알고 싶으면
+# 공식 문서를 참고해주세요!
+
+
+
+동작 시나리오:
+
+0초
+첫 조회 (DB 조회 + 캐시 저장)
+TTL 타이머 시작 (0~10초)
+
+5초
+다시 조회
+캐시 HIT (타이머 그대로 유지)
+
+10초 경과
+만료 시점 도달 (아직 삭제 X)
+ㅤ
+11초
+다시 조회
+캐시 만료 감지 → DB 재조회 + 새 캐시 생성 (타이머 리셋됨)
+
+
+💬 즉, “5초에 한 번씩 조회해도 10초 기준으로 사라진다.”
+
+
+
+
+ ✅ @Cacheable(value, key) 구조 상세 이해
+ 
+⚙️ “어디에(value)”, “무엇을(key로)” 저장할지를 지정하는 어노테이션.
+
+
+
+@Cacheable(value = "postCache", key = "#postId")
+
+실제 저장 구조 : 
+
+Cache name: postCache
+Key: 1
+Value: PostDto(id=1, content="Spring Cache 실습" , username="김동현")
+
+
+
+@Cacheable(value = "userCache", key = "#userId") -> userId = 1 호출
+public UserDto getUserById(long userId)
+
+@Cacheable(value = "postCache", key = "#postId") -> postId = 10, postId = 11 호출
+public PostDto getPostById(long postId)
+
+@Cacheable(value = "commentCache", key = "#commentId") -> commentId = 101 호출
+public CommentDto getCommentById(long postId)
+
+
+CacheManager
+ ┣━━ userCache
+ │     ┗━━ key: 1 → UserDto(id=1)
+ ┣━━ postCache
+ │     ┣━━ key: 10 → PostDto(id=10)
+ │     ┗━━ key: 11 → PostDto(id=11)
+ ┗━━ commentCache
+       ┗━━ key: 101 → CommentDto(id=101)
+
+
+💬 value는 “캐비닛 이름”, key는 “서류 번호”로 이해
+
+
+
+✅ value와 key 설계 기준
+
+같은 캐시 그룹(value)을 유지하되, key로 데이터 범위를 구분
+
+
+예시 1: 같은 도메인 캐시 (postCache)
+
+>
+```
+@Cacheable(value = "postCache", key = "#postId")
+public PostDto getPostById(Long postId) { ... }
+-
+@Cacheable(value = "postCache", key = "#username")
+public List<PostDto> getPostByUsername(String username) { ... }
+```
+
+실제 캐시 구조
+
+postCache::1         → PostDto(게시글 1의 내용)
+postCache::kim       → List<PostDto> (kim의 게시글 내용들)
+
+
+
+주의 — key 충돌 방지
+username이 "1" 같은 숫자일 수도 있는 경우,
+postCache::1 과 겹칠 수 있음.
+→ prefix를 추가해 구분해줘야 안전함
+
+@Cacheable(value = "postCache", key = "'id:' + #postId")
+@Cacheable(value = "postCache", key = "'username:' + #username")
+
+
+결과 : 
+postCache::id:1
+postCache::username:kim
+
+
+
+✅ 캐시 Key 네이밍 규칙
+
+
+기본 규칙
+고유하고 일관된 형식으로 구성 (도메인:식별자)
+복합 조건은 파라미터 포함 (search:{keyword}:{page})
+Redis에서는 prefix로 분류 관리 (user:*, post:*)
+ 
+실무 팁
+Key를 명확히 구분하면 모니터링, 삭제, 장애 복구가 쉬워짐
+구분자는 : 또는 :: (Spring 기본 cacheName::key)
+운영 환경에서는 Key 길이를 줄이되 의미는 명확히
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

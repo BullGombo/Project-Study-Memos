@@ -1,0 +1,378 @@
+Spring Plus 3
+
+
+
+# Redis
+
+Remote Dictionary Server
+
+데이터를 메모리(RAM)에 저장하는 초고속 Key-Value 데이터베이스
+
+메모리에서 읽고 쓰기 때문에 속도가 빠름
+
+SSD/HDD 디스크를 거치지 않는다
+
+- In-memory : 기반 모든 데이터를 메모리에 저장하므로 매우 빠른 응답 속도 제공
+- Key-Value 구조 : Key 하나당 하나의 Value를 저장 (Value는 다양한 자료구조 가능)
+- 데이터 구조 다양성 : String, List, Set, Hash, Sorted Set, Stream 등
+- TTL 지원 : 각 Key마다 만료시간(Time To Live) 설정 가능
+
+
+
+Redis의 다양한 자료형
+
+String
+단일 값 저장
+"user:1" -> "Ravi"
+List
+순서 있는 데이터
+"queue" -> [A, B, C]
+Set
+중복 없는 집합
+"tags" -> {spring, redis}
+Hash
+필드-값 쌍
+"user:1" -> {name: Ravi, age: 30}
+Sorted Set
+점수 기반 정렬
+"ranking" -> {Ravi:100, Kim:200}
+
+| 자료구조 (Type)           | 설명                               | Key 예시      | Value 예시                |
+| --------------------- | -------------------------------- | ----------- | ----------------------- |
+| **String**            | 단일 값 저장 (문자열, 숫자 모두 가능)          | `"user:1"`  | `"Ravi"`                |
+| **List**              | 순서가 있는 데이터 (Queue / Stack 가능)    | `"queue"`   | `[A, B, C]`             |
+| **Set**               | 중복 없는 집합 (순서 없음)                 | `"tags"`    | `{spring, redis}`       |
+| **Hash**              | 필드-값(Field-Value) 구조 (객체 표현에 적합) | `"user:1"`  | `{name: Ravi, age: 30}` |
+| **Sorted Set (ZSet)** | 점수(score) 기반 자동 정렬               | `"ranking"` | `{Ravi: 100, Kim: 200}` |
+
+
+
+redis 실행 및 접속 스샷 첨부
+
+
+redis cli 실습
+String/list/set/hash/sortedset 사용 실습
+
+
+
+
+✅ Redis의 데이터 영속성 (Persistence)
+
+RDB (Redis Database Snapshot)
+일정 주기마다 전체 데이터를 스냅샷으로 저장
+빠름, 주기적 백업
+AOF (Append Only File)
+실행된 명령어를 순차적으로 기록
+높은 안정성, 복구 가능
+Hybrid
+RDB + AOF 혼합
+Redis 7.x 이상 기본 설정
+
+
+Persistence 옵션(RDB / AOF)을 통해 데이터를 디스크에 저장할 수도 있긴함
+
+사실 Redis는 “DB”라기보다 캐시 서버(Cache Server)로 분류
+
+
+-----------------------------------------------------------------------------------------------
+
+
+RedisTemplate
+
+- Spring이 제공하는 Redis용 클라이언트
+- Java 코드로 Redis 명령어를 대신 실행해주는 도구
+
+Java 언어로 CLI상의 명령과 동일한 작업을 요청해서 
+RedisTemplate이 그걸 Redis 명령어(SET, GET 등)로 번역해서 Redis 서버에 전달
+
+반대로 Redis 서버에서 받은 데이터를 Java 객체로 바꿔서 돌려주기도 함
+
+>RedisTemplate 흐름도
+```java
+[ Java 코드 ]
+      │      "user:1=Ravi" 저장하고 싶어요 
+      ▼
+[ RedisTemplate ]
+      │      SET user:1 "Ravi"
+      ▼
+[ Redis 서버 ]
+      │      저장 완료! 
+      ▼
+[ 결과 반환 ]
+```
+
+
+## 실제 예시
+
+> 아래의 java코드가 있다면,
+```java
+// String 예제
+redisTemplate.opsForValue().set("user:1", "Ravi");
+String name = (String) redisTemplate.opsForValue().get("user:1");
+System.out.println(name); // Ravi
+```
+
+>내부적으로 아래와 같은 명령어를 보내게 됨
+```
+SET user:1 "Ravi"
+GET user:1
+```
+
+- opsForValue()는 문자열 (String) 자료형을 다루는 도우미
+- set() / get() 등은 Redis 명령어를 실행하는 함수
+
+
+
+| 역할 (RedisTemplate) | 설명              | Redis 명령            |
+| ------------------ | --------------- | ------------------- |
+| `opsForValue()`    | 단일 값 저장 / 조회    | `SET` / `GET`       |
+| `opsForHash()`     | 해시(Hash) 구조 저장  | `HSET` / `HGET`     |
+| `opsForList()`     | 리스트(List) 형태 저장 | `LPUSH` / `LRANGE`  |
+| `opsForSet()`      | 중복 없는 집합(Set)   | `SADD` / `SMEMBERS` |
+| `opsForZSet()`     | 점수 기반 순위 정렬 집합  | `ZADD` / `ZRANGE`   |
+
+
+
+### TTL(만료 시간) 설정 예시
+
+
+>
+```java
+// (key, value, 기간, 단위(초, 분, 시간))
+redisTemplate.opsForValue().set("temp:data", "123", 10, TimeUnit.MINUTES);
+```
+
+#### → Redis 내부 명령어:
+>
+```
+SET temp:data "123" EX 600
+```
+
+
+
+---
+
+
+## ✅ Cache-Aside 패턴 (읽기 시 캐싱, 쓰기 시 무효화)
+
+
+- 데이터를 먼저 캐시에서 찾고, 없으면 DB에서 가져와 캐시에 저장하는 패턴
+→ “읽을 땐 캐싱, 쓸 땐 캐시 삭제” 방식
+
+
+
+#### Spring Boot 버전
+
+>
+```java
+    public Post getPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        return post;
+    }
+```
+
+#### Spring Boot + Redis  버전
+
+>
+```java
+    // 1️⃣ 읽기 시 캐싱
+    public Post getPost(Long postId) {
+        String key = PREFIX + postId;
+-
+        // (1) 캐시 확인
+        Post cached = (Post) redisTemplate.opsForValue().get(key);
+        if (cached != null) {
+            System.out.println("✅ Cache Hit");
+            return cached;
+        }
+-
+        // (2) 없으면 DB에서 조회 ✅ Cache Miss
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+-
+        // (3) 캐시에 저장
+        redisTemplate.opsForValue().set(key, post, 10, TimeUnit.MINUTES);
+        return post;
+    }
+```
+
+---
+
+## ✅ 캐시 키 네이밍 전략
+ 
+Redis는 모든 데이터가 Key 기반으로 저장되므로,
+명확한 네이밍 규칙이 없으면 데이터 충돌이나 추적이 어려워짐
+
+
+> 기본 규칙
+```
+{도메인}:{리소스}:{식별자}
+```
+
+### 예시
+
+| 용도      | 예시 Key                | 설명                      |
+| ------- | --------------------- | ----------------------- |
+| 사용자 정보  | `user:123`            | `userId = 123` 사용자의 데이터 |
+| 게시글 정보  | `post:987`            | `postId = 987` 게시글 캐시   |
+| 사용자별 피드 | `feed:user:123`       | 특정 사용자의 피드 목록           |
+| 댓글 리스트  | `comment:post:987`    | 게시글 `987`의 댓글 목록        |
+| 랭킹      | `ranking:game:weekly` | 주간 게임 랭킹                |
+
+
+
+### 네이밍 팁
+
+- 콜론(:) 으로 계층 구조를 표현
+- 고정 Prefix (user:, post:)로 역할을 구분
+- Key 이름만 보고도 무엇을 의미하는지 이해 가능하게 설계
+- 캐시 Key는 코드 상에서도 상수로 관리
+
+```
+private static final String USER_CACHE_PREFIX = "user:";
+private static final String POST_CACHE_PREFIX = "post:";
+```
+
+
+---
+
+
+## ✅ TTL(Time To Live) 설계 전략
+
+>
+```
+redisTemplate.opsForValue().set("post:1", post, 10, TimeUnit.MINUTES);
+```
+
+→ 10분 뒤 자동 만료 (Redis 명령: EXPIRE post:1 600)
+
+
+
+| 데이터 종류      | TTL 예시   | 이유             |
+| ----------- | -------- | -------------- |
+| 사용자 프로필     | 1시간 ~ 1일 | 자주 변경되지 않음     |
+| 게시글 상세      | 5 ~ 30분  | 일부 수정 가능성 있음   |
+| 실시간 인기글     | 1 ~ 5분   | 빠르게 변동됨        |
+| 로그인 세션 / 토큰 | 10 ~ 60분 | 보안 및 유효성 관리 필요 |
+| 통계 / 대시보드   | 5분 이내    | 최신 데이터 반영 필요   |
+
+
+
+#### 설계 팁
+데이터 변경 주기가 길면 TTL을 길게
+조회가 잦고 변경이 적은 데이터일수록 캐싱 효율이 높음
+TTL이 너무 짧으면 캐시 효율 ↓
+TTL이 너무 길면 데이터 최신성 ↓
+
+
+---
+---
+
+
+## ✅ 실습 1. Cache-Aside 기본 캐싱
+ 
+핵심 개념
+Redis에 먼저 조회 (Cache Hit)
+캐시에 없으면 DB 조회 후 Redis에 저장 (Cache Miss)
+DB 데이터가 변경되면 Redis 캐시를 삭제 (Invalidate)
+ 
+
+
+### 흐름 구조
+
+- 게시글 조회
+
+```
+[Client]
+   ↓
+[Controller]
+   ↓
+[Service]
+   ↓
+1️⃣ Redis 캐시 조회 (get)
+   ↓
+2️⃣ 캐시 없으면 DB 조회 (findById)
+   ↓
+3️⃣ Redis 캐시에 저장 (set)
+   ↓
+4️⃣ 응답 반환
+```
+
+- 수정(업데이트) 시 동작
+
+```
+[Client PUT 요청]
+   ↓
+1️⃣ DB 수정
+   ↓
+2️⃣ Redis 캐시 삭제 (delete)
+```
+
+
+## ✅ 실습 2. 조회수 기반 인기 게시글 (Sorted Set 활용)
+
+
+### 흐름 구조
+
+
+- 게시글 조회
+
+```
+[사용자 게시글 조회 요청]
+   ↓
+1️⃣ 캐시 조회 (Cache Hit → 바로 리턴)
+   ↓
+2️⃣ 캐시 Miss → DB 조회 후 캐시에 저장
+   ↓
+3️⃣ ZSet에 조회수 +1 (ZINCRBY)
+   ↓
+4️⃣ 응답 반환
+```
+
+
+- 인기 게시글 조회 흐름
+
+```
+[Client 요청: 인기글 조회]
+   ↓
+1️⃣ ZSet에서 상위 N개 postId 조회 (ZREVRANGE)
+   ↓
+2️⃣ 캐시에서 postId에 해당하는 데이터 조회
+   ↓
+3️⃣ 캐시 없으면 DB에서 조회 후 캐싱
+   ↓
+4️⃣ 정렬된 순서대로 PostDto 반환
+```
+
+
+---
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

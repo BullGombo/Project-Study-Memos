@@ -1,0 +1,14 @@
+
+id		BIGINT	id
+user_id	BIGINT	assigneeId
+title		VARCHAR	title
+content	VARCHAR	description
+status		ENUM	status
+priority	ENUM	priority
+due_date	DATETIME	dueDate
+created_at	DATETIME	createdAt
+updated_at	DATETIME	updatedAt
+is_deleted	TINYINT	is_deleted
+
+
+"assignee": { "id": 1, "username": "johndoe", "name": "John Doe" }

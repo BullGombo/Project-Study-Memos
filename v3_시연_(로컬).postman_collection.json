@@ -1,0 +1,2272 @@
+{
+  "info": {
+    "_postman_id": "558c083a-bf1b-488d-8a71-901d2e36f043",
+    "name": "v3_시연_(로컬)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "49708416",
+    "_collection_link": "https://go.postman.co/collection/49708416-558c083a-bf1b-488d-8a71-901d2e36f043?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "로그인(로컬)",
+      "item": [
+        {
+          "name": "일반회원 로그인",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"user011\",\n\t \"password\" : \"qwer1234A!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "관리자 로그인",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loginId\": \"admin01\",\n  \"password\": \"admin1@1324\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "인플루언서 로그인",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"testid12\",\n\t \"password\" : \"awdfth1324\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "사용자(로컬)",
+      "item": [
+        {
+          "name": "일반 유저 회원가입",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"test\",\n\t \"password\" : \"12345678\",\n\t \"name\" : \"김두한\",\n\t \"email\" : \"test@email.com\",\n\t \"phone\" : \"010-1111-2222\",\n\t \"nickname\" : \"kimdohan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/users/normal",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "users",
+                "normal"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "인플루언서 유저 회원가입",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"testinfluencer\",\n\t \"password\" : \"12345678\",\n\t \"name\" : \"마진식\",\n\t \"email\" : \"testinfluencer@email.com\",\n\t \"phone\" : \"010-1122-1122\",\n\t \"nickname\" : \"majinsik\",\n     \"influencerSocialLink\": \"https://www.notion.so/teamsparta/S-A-2ef2dc3ef51480688c49ca84a51d7560?p=2f02dc3ef51480c6b9fbebf9d7e953c8&pm=s\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/users/influencer",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "users",
+                "influencer"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "사용자 프로필 조회",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiLquYDthYzsiqTtirjsiJjsoJUiLCJ1c2VyUm9sZSI6IlVTRVIiLCJleHAiOjE3NzAxOTA3MTgsImlhdCI6MTc3MDE5MDExOH0.yr8rZDQjDdAACeYjj5U4wf2lh70rkNqrCFZQI-HlW3A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/users/1/profile",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "users",
+                "1",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반유저 로그인",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"test\",\n\t \"password\" : \"12345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "인플루언서 로그인",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"testinfluencer\",\n\t \"password\" : \"12345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "리프래쉬 토큰 재발급",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/reissue",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "reissue"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "관리자 로그인",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"admin\",\n\t \"password\" : \"12345678!!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "로그아웃",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/auth/logout",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "사용자 프로필 수정",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiLquYDthYzsiqTtirjsiJjsoJUiLCJ1c2VyUm9sZSI6IlVTRVIiLCJleHAiOjE3NzAxOTc0NTIsImlhdCI6MTc3MDE5Njg1Mn0.Sw1KllLM0Z6-F3K8WTQA3G4XRs1sNw45imNZ_EY7Vvc",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "userUpdateRequest",
+                  "value": "{\n    \"email\": \"test@naver.com\",\n    \"nickname\": \"김테스트수정\",\n    \"phone\": \"010-1212-1313\"\n}",
+                  "type": "text",
+                  "uuid": "59af92ec-d4e6-498a-9ebc-d5e67cbef166",
+                  "contentType": "application/json"
+                },
+                {
+                  "key": "profileImage",
+                  "type": "file",
+                  "uuid": "7030b86f-3c12-4795-8941-c4ae4b3a909b",
+                  "contentType": "",
+                  "src": "/C:/Users/Admini/OneDrive/사진/Screenshots/스크린샷 2025-06-16 235147.png"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "회원 삭제",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMiIsIm5pY2tuYW1lIjoi64KY64qU7IKt7KCc65Cg7JWE7J2065SUIiwidXNlclJvbGUiOiJVU0VSIiwiZXhwIjoxNzY5MTI3MzM0LCJpYXQiOjE3NjkxMjY3MzR9.OrkP7h5nRA08e1r3TF8p5pe9ltH9i3ybG2sP0pD-qjQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"password\" : \"test1234\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/users",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "users"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "관리자(로컬)",
+      "item": [
+        {
+          "name": "결제정보조회",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwibmlja25hbWUiOiLqtIDrpqzsnpAiLCJ1c2VyUm9sZSI6IkFETUlOIiwiZXhwIjoxNzcwNjMzNzM4LCJpYXQiOjE3NzA2MzAxMzh9.os_odWKPVFyAAGDxQikLhNKyXqExikzPP5X75ZgEezo",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/admin/payment",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "admin",
+                "payment"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "인플루언서 가입 승인",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwibmlja25hbWUiOiLqtIDrpqzsnpAiLCJ1c2VyUm9sZSI6IkFETUlOIiwiZXhwIjoxNzY5NDEyMTk0LCJpYXQiOjE3Njk0MTE1OTR9.IkeMBQxGqZzIYZ_nKinJ61K0qR_9HNU8Ad7855Jo2GA",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"approve\" : true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/admin/influencers/11/approval",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "admin",
+                "influencers",
+                "11",
+                "approval"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "인플루언서 목록 조회",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiLqtIDrpqzsnpAiLCJ1c2VyUm9sZSI6IkFETUlOIiwiZXhwIjoxNzY5NTc5NjMwLCJpYXQiOjE3Njk1NzkwMzB9._QlPoV-uP254GOd1odOUvmNm7zCqZUdxwrFZJVeHA_M",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [
+              {
+                "key": "status",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "size",
+                "value": "2",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/admin/influencers?size=1000&page=1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "admin",
+                "influencers"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "1000"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "사용자 목록 조회",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1Iiwibmlja25hbWUiOiLqtIDrpqzsnpAiLCJ1c2VyUm9sZSI6IkFETUlOIiwiZXhwIjoxNzY5NDExODk5LCJpYXQiOjE3Njk0MTEyOTl9.xh6n1D47GtzqOcyRiHicVeNecujsHn9TAUF3nylfmL0",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/users?size=50&number=2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "size",
+                  "value": "50"
+                },
+                {
+                  "key": "number",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "공동구매 게시물(로컬)",
+      "item": [
+        {
+          "name": "공동구매 게시물 생성",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3Iiwibmlja25hbWUiOiLsnbjtlIzro6jslrjshJzrsJUiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NzAzNTEyNTQsImlhdCI6MTc3MDM1MDY1NH0.6RkCywzh8xC3VPzfBcEImtb-QWZWjs6RhOqBl6hcTmk",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "gppCreateRequest",
+                  "value": "{\n  \"productName\": \"두바이 쫀득 쿠키 3개입\",\n  \"content\": \"설명 어쩌구 저쩌구 어쩌구 저쩌구\",\n  \"image\": \"String\",\n  \"price\": 14900,\n  \"linkUrl\": \"https://zep.us/play/nL9kqr\",\n  \"category\": \"ETC\",\n  \"startDate\": \"2026-02-26T00:00:00.000\",\n  \"endDate\": \"2026-02-28T00:00:00.000\"\n}",
+                  "type": "text",
+                  "uuid": "7807f832-b33b-44ca-b0be-c993ac08e7ce",
+                  "contentType": "application/json"
+                },
+                {
+                  "key": "contentImage",
+                  "type": "file",
+                  "uuid": "beb01e08-3b5d-49b3-bea5-d7c233c27c39",
+                  "src": "/C:/Users/KDW3070ti/Desktop/3070ti/IMG_5008.webp"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 전체 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 상세 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 수정",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3Iiwibmlja25hbWUiOiLsnbjtlIzro6jslrjshJzrsJUiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NzA3OTM4MTQsImlhdCI6MTc3MDc5MzIxNH0.xIhejziSeUFSx2sbxmUeZ4vndc1z265I9hoZtA503Nc",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "gppUpdateRequest",
+                  "value": "{\n  \"productName\": \"튀김우동 8개입\",\n  \n  \"content\": \"튀김우동 팝니다!\",\n  \"image\": \"\",\n  \"price\": 5500,\n  \"linkUrl\": \"https://zep.us/play\",\n  \"category\": \"ETC\",\n  \"gppProgressStatus\": \"종료됨\",\n  \"startDate\": \"2026-04-01T00:00:00.000\",\n  \"endDate\": \"2026-04-02T00:00:00.000\"\n}",
+                  "type": "text",
+                  "uuid": "e0c2083c-e771-4f28-ab1a-34ee8bbae5b5",
+                  "contentType": "application/json"
+                },
+                {
+                  "key": "contentImage",
+                  "type": "file",
+                  "uuid": "724ae136-591f-42f5-8f8d-758e1d509810",
+                  "src": "/C:/Users/KDW3070ti/Desktop/3070ti/IMG_5008.webp"
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts/40010",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts",
+                "40010"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"productName\": \"수정된 상품명\",\r\n  \"userId\": 1, \r\n  \"content\": \"수정된 설명\",\r\n  \"image\": \"\",\r\n  \"price\": 11111111,\r\n  \"linkUrl\": \"https://zep.us/r\",\r\n  \"category\": \"기타\",\r\n  \"startDate\": \"2026-01-01T00:00:00.000\",\r\n  \"endDate\": \"2026-01-07T00:00:00.000\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "공동구매 게시물 댓글(로컬)",
+      "item": [
+        {
+          "name": "공동구매 게시물 댓글 생성",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI5Iiwibmlja25hbWUiOiLtmozsm5Dri4nrhKTsnoQiLCJ1c2VyUm9sZSI6IlVTRVIiLCJleHAiOjE3Njg4NzU4MDMsImlhdCI6MTc2ODg3MjIwM30.40_V4FOGkBpIKXgHQhPTiernuO5o7PGklFHZYQsKQ_w",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"gppId\": 6,\n    \"content\": \"이거 알림 설정할게여 ;;\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://52.78.214.54:8080/zero9/gpp-comments",
+              "protocol": "http",
+              "host": [
+                "52",
+                "78",
+                "214",
+                "54"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gpp-comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 댓글 생성",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiJkb25nZG9uZyIsInVzZXJSb2xlIjoiVVNFUiIsImV4cCI6MTc2ODY3MTY3MywiaWF0IjoxNzY4NjY4MDczfQ.8b0oavc3NeudLg-Oig0G5DWYfidiGdduunvD-CajM3A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"productName\": \"두바이 쫀득 쿠키 3개입\",\r\n  \r\n  \"content\": \"설명 어쩌구 저쩌구 어쩌구 저쩌구\",\r\n  \"image\": \"String\",\r\n  \"price\": 14900,\r\n  \"linkUrl\": \"https://zep.us/play/nL9kqr\",\r\n  \"category\": \"디저트\",\r\n  \"gppProgressStatus\": \"준비중\",\r\n  \"startDate\": \"2026-01-01T00:00:00.000\",\r\n  \"endDate\": \"2026-01-07T00:00:00.000\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/gpp-comments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gpp-comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 댓글 전체 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": ""
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 댓글 수정",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiJkb25nZG9uZyIsInVzZXJSb2xlIjoiVVNFUiIsImV4cCI6MTc2ODc4MzIyMywiaWF0IjoxNzY4Nzc5NjIzfQ.dIXtCP0mfuLoDJkZBdJAYPkj9o5gJkIFuT2jj3pSA0A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"content\": \"수정한 댓글 내용 어쩌구 저쩌구 어쩌구 저쩌구\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/gpp-comments/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gpp-comments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 댓글 삭제",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiJkb25nZG9uZyIsInVzZXJSb2xlIjoiVVNFUiIsImV4cCI6MTc2ODc4MzIyMywiaWF0IjoxNzY4Nzc5NjIzfQ.dIXtCP0mfuLoDJkZBdJAYPkj9o5gJkIFuT2jj3pSA0A",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"content\": \"수정한 댓글 내용 어쩌구 저쩌구 어쩌구 저쩌구\"\r\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/gpp-comments/2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gpp-comments",
+                "2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "일반 게시물(로컬)",
+      "item": [
+        {
+          "name": "일반 게시물 생성",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\":\"안녕하세요 ㅎㅎ\",\n  \"content\": \"공구 정보 공유하기 위해 가입했어요 !\",\n  \"image\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반 게시물 목록 조회",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반 게시물 상세 조회",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반 게시물 수정",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\":\"앰플 공구 정보 있는 분 ??\",\n  \"content\": \"구합니다 ~~\",\n  \"image\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반 게시물 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "공동구매 게시물 일정 팔로우(로컬)",
+      "item": [
+        {
+          "name": "공동구매 게시물 일정 팔로우",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIyIiwibmlja25hbWUiOiLsgqzsmqnsnpDri4nrhKTsnoQiLCJ1c2VyUm9sZSI6IlVTRVIiLCJleHAiOjE3Njk0MTE4MjUsImlhdCI6MTc2OTQxMTIyNX0.jrzIdzXTw0y3lf2HdLWb-6nB6LCOrjeUz6JT0OsjGvI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts/1/follows",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts",
+                "1",
+                "follows"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 일정 팔로우 취소",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3Iiwibmlja25hbWUiOiLstZzsoJXsnKTri4nrhKTsnoQiLCJ1c2VyUm9sZSI6IlVTRVIiLCJleHAiOjE3Njg5MDE1MzEsImlhdCI6MTc2ODg5NzkzMX0.MpLgB7sJ1-vCs27OPVbpBBkE0GUCrz1NBXC3OMfVrUU",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"gppId\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts/1/follows",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts",
+                "1",
+                "follows"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 일정 팔로우 목록 조회",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3Iiwibmlja25hbWUiOiLstZzsoJXsnKTri4nrhKTsnoQiLCJ1c2VyUm9sZSI6IlVTRVIiLCJleHAiOjE3Njg5MDE1MzEsImlhdCI6MTc2ODg5NzkzMX0.MpLgB7sJ1-vCs27OPVbpBBkE0GUCrz1NBXC3OMfVrUU",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/gp-posts/follows",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "gp-posts",
+                "follows"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "일반 게시물 댓글(로컬)",
+      "item": [
+        {
+          "name": "일반 게시물 댓글 전체 조회",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"postId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts/3/comments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts",
+                "3",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반 게시물 댓글 생성",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"postId\" : 3,\n    \"content\": \"안녕하세요 ㅎㅎ\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts/2/comments",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts",
+                "2",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반 게시물 댓글 수정",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"content\": \"안녕하세요 ㅎㅎ 정보 구하러 가입햇어요 >_<\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts/2/comments/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts",
+                "2",
+                "comments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "일반 게시물 댓글 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/posts/2/comments/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "posts",
+                "2",
+                "comments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "찜(로컬)",
+      "item": [
+        {
+          "name": "공동구매 상품 게시물 찜",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t \"loginId\" : \"user1\",\n\t \"password\" : \"awdfth1324\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1/favorites",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1",
+                "favorites"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 찜 취소",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1/favorites",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1",
+                "favorites"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "공동구매 게시물 찜 목록 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://52.78.214.54:8080/zero9/favorites",
+              "protocol": "http",
+              "host": [
+                "52",
+                "78",
+                "214",
+                "54"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "favorites"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "검색(로컬)",
+      "item": [
+        {
+          "name": "통합 검색",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/search-logs?keyword=교촌",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "search-logs"
+              ],
+              "query": [
+                {
+                  "key": "postType",
+                  "value": "product_title",
+                  "disabled": true
+                },
+                {
+                  "key": "postType",
+                  "value": "content",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "postType",
+                  "value": "influencer",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "keyword",
+                  "value": "교촌"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "최근검색어 조회",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/search-logs/recent",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "search-logs",
+                "recent"
+              ],
+              "query": [
+                {
+                  "key": "searchCondition",
+                  "value": "product_title",
+                  "disabled": true
+                },
+                {
+                  "key": "",
+                  "value": "공구",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "비속어 단어 목록 최신화",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/admin/profanity/refresh",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "admin",
+                "profanity",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "비속어 사전 단어 추가",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/admin/profanities/쉬발럼이",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "admin",
+                "profanities",
+                "쉬발럼이"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "비속어 사전 단어 삭제",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/admin/profanities/쉬발럼이",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "admin",
+                "profanities",
+                "쉬발럼이"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ES 역 벌크 인덱싱",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:9200/zero9/search-logs/admin/search/bulkreindex",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9200",
+              "path": [
+                "zero9",
+                "search-logs",
+                "admin",
+                "search",
+                "bulkreindex"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "상품판매 게시물(로컬)",
+      "item": [
+        {
+          "name": "상품 게시물 생성",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkwOTY1MzIsImlhdCI6MTc2OTA5MjkzMn0.GRslZ9N7e_8B1kw1Vy6QEHZt0He7qKXZLf1hYCECTTg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"title\": \"정윤pick! 벨르랑코 선크림\",\n    \"content\": \"파데프리 벨르랑코 선크림 공구 진행합니다 !\",\n    \"stock\": 500,\n    \"image\": null,\n    \"category\": \"뷰티\",\n    \"productPostProgressStatus\": \"준비중\",\n    \"startDate\": \"2026-01-23T00:00:00.000\",\n    \"endDate\": \"2026-01-29T00:00:00.000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/product/1/product-posts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product",
+                "1",
+                "product-posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "상품 게시물 상세 조회",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkxNTQ3OTksImlhdCI6MTc2OTE1MTE5OX0.6MIEzdAO3Ra58kg7LIdCtbj3wYRHAa6mxtD7FDGOkHc",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"title\": \"정윤pick! 벨르랑코 선크림\",\n    \"content\": \"파데프리 벨르랑코 선크림 공구 진행합니다 !\",\n    \"stock\": 500,\n    \"image\": null,\n    \"category\": \"뷰티\",\n    \"productPostProgressStatus\": \"준비중\",\n    \"startDate\": \"2026-01-23T00:00:00.000\",\n    \"endDate\": \"2026-01-29T00:00:00.000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "상품 게시물 목록 조회",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "상품 게시물 수정",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiLqtIDrpqzsnpAiLCJ1c2VyUm9sZSI6IkFETUlOIiwiZXhwIjoxNzcwNzk0NDg1LCJpYXQiOjE3NzA3OTM4ODV9.BVyFwn3a6z-W_TsgtQMDmloNG8k_Vm8VZXZx-2FTw38",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "ppUpdateRequest",
+                  "value": "{\n\t\"title\": \"정윤 pick! [벨르랑코 선크림] 공구 알림\"\n}",
+                  "type": "text",
+                  "uuid": "6b2c5a2e-9ab8-42c8-a287-79b4a7b5b66e",
+                  "contentType": "application/json"
+                },
+                {
+                  "key": "contentImage",
+                  "type": "file",
+                  "uuid": "1106638b-b07d-4d54-ba30-2203bf6ca60a",
+                  "src": "/Users/choi_jungyoon/Downloads/4.jpg",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "옵션(로컬)",
+      "item": [
+        {
+          "name": "옵션 추가 생성",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkzNTQyMjIsImlhdCI6MTc2OTM1MzYyMn0.s7-ke_0icve7T13gF-pCp6SNQ0i8lrNV0AnhMah8FYI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"1개\",\n    \"optionPrice\": 38000,\n    \"capacity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1/options",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1",
+                "options"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "옵션 상세 조회",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkzNTQyMjIsImlhdCI6MTc2OTM1MzYyMn0.s7-ke_0icve7T13gF-pCp6SNQ0i8lrNV0AnhMah8FYI",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"name\": \"1개\",\n    \"optionPrice\": 38000,\n    \"capacity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1/options",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1",
+                "options"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "옵션 삭제",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3Njk2Njc2NTAsImlhdCI6MTc2OTY2NzA1MH0.TjgGaCxfyA8l8nmuSrda3msMBV-tA3Ds5Wi0GRMoTas",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1/options/5",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1",
+                "options",
+                "5"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "주문 상품(로컬)",
+      "item": [
+        {
+          "name": "주문 상품 생성",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkyOTQ3MTgsImlhdCI6MTc2OTI5MTExOH0.LyUappqAcVfgwH4Wrm6Fh9JrhVJjDAeUsXXeCEW3pso",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"optionId\": 2,\n    \"quantity\": 3\n    }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/product-posts/1/order-items",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "product-posts",
+                "1",
+                "order-items"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "주문 상품 상세 조회",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkyOTUzODMsImlhdCI6MTc2OTI5MTc4M30.HdFgmN30vW84tCuFkawR7GcfpFFcNiSwYUWlMq-AxsM",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/order-items/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "order-items",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "주문 상품 삭제",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkyOTUzODMsImlhdCI6MTc2OTI5MTc4M30.HdFgmN30vW84tCuFkawR7GcfpFFcNiSwYUWlMq-AxsM",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/order-items/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "order-items",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "주문(로컬)",
+      "item": [
+        {
+          "name": "주문 생성",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkzMDU5MzEsImlhdCI6MTc2OTMwMjMzMX0.QWxFgjAFkX-s7Jq1aT8utaOLNA8ASFXpsbnORAeD9Qs",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/order-item/2/orders",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "order-item",
+                "2",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "주문 상세 조회",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkzMDU5MzEsImlhdCI6MTc2OTMwMjMzMX0.QWxFgjAFkX-s7Jq1aT8utaOLNA8ASFXpsbnORAeD9Qs",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/orders/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "orders",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "사용자의 주문 목록 조회",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIzIiwibmlja25hbWUiOiLsoJXsnKQiLCJ1c2VyUm9sZSI6IklORkxVRU5DRVIiLCJleHAiOjE3NjkzMTY5MjIsImlhdCI6MTc2OTMxMzMyMn0.x8XRXWj0qNq3D5svmDJnEmIcGKhRY-tE1VP8b2sekgQ",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/orders",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "주문 취소",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiLqtIDrpqzsnpAiLCJ1c2VyUm9sZSI6IkFETUlOIiwiZXhwIjoxNzcwNzk0MTAxLCJpYXQiOjE3NzA3OTM1MDF9.f2Eo6RN0Yi5RwMbscSwZJ_JyYrSq49AUz6Ft6D1YRVk",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"canceledReason\": \"단순변심\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/orders/2/cancel",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "orders",
+                "2",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "결제 완료",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmlja25hbWUiOiLqtIDrpqzsnpAiLCJ1c2VyUm9sZSI6IkFETUlOIiwiZXhwIjoxNzcwNTYwOTY2LCJpYXQiOjE3NzA1NjAzNjZ9.CcoxjhxNKZ9qqyOjh7q2Dd4XmlwhN_R6Hsy7dlVpm7g",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"orderNo\": \"tIt3B3ciQZWHv33TJnhE\",\n    \"paymentKey\": \"test_payment_key_12345\",\n    \"amount\": 35000\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8080/zero9/orders/1",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "orders",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "제로나인나우(로컬)",
+      "item": [
+        {
+          "name": "로그인 본인 피드",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/feeds/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "feeds",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "전체 피드 조회",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/zero9/feeds/all",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "zero9",
+                "feeds",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMCIsIm5pY2tuYW1lIjoi7Ja47KCg6rCAIiwidXNlclJvbGUiOiJVU0VSIiwiZXhwIjoxNzcwODIwNzQzLCJpYXQiOjE3NzA4MjAxNDN9._uAyYSGZyipMFH-A3SzH7mjL9dhAkp3IKzw5DIPqgF8",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

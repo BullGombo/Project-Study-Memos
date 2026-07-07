@@ -1,0 +1,49 @@
+### 일반 게시물 -> 공지/문의 게시물 수정
+
+게시판 유형 분리 + 단일 테이블 전략
+- board_type (NOTICE / QNA) 컬럼 추가
+
+권한/가시성 제어
+- 공지: 관리자만 작성/수정
+- 문의: 작성자 본인 + 관리자만 조회
+비밀글(SECRET) 지원
+Spring Security + 서비스 레벨 검증
+
+문의 답변 구조
+- Question (문의)
+- Answer (관리자 답변) → 1:1 관계
+- QnaStatus: WAITING / ANSWERED / CLOSED
+상태 변경 트랜잭션
+답변 생성 시 문의 상태 자동 변경
+삭제 시 상태 롤백 처리
+
+조회수 / 공지 고정 / 우선순위 정렬
+공지 isPinned
+정렬 우선순위:
+1. pinned
+2. createdAt desc
+조회수는 Redis 캐싱 적용 가능
+
+검색 & 필터
+- 키워드 (title/content)
+- 문의 상태 (WAITING / ANSWERED)
+- 작성자
+- 기간 필터
+→ QueryDSL로 
+
+비밀글 처리
+- content 일부 마스킹
+혹은 content 암호화 저장 (JPA AttributeConverter)
+
+알림 시스템 연동
+- 문의 등록 → 관리자 알림
+- 답변 등록 → 사용자 알림
+- Spring Event (ApplicationEvent)
+- 비동기 처리 (@Async)
+- 이후 Kafka/RabbitMQ로 확장 가능
+
+관리자 전용 대시보드 API
+- 미답변 문의 수
+- 평균 응답 시간
+- 상태별 문의 비율
+단순 COUNT 쿼리 + 인덱싱

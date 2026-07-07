@@ -1,0 +1,205 @@
+고도화 계획 초기 리스트 옮김
+
+
+---
+2/4~2/9 일부
+
+##### 아래는 안할거같음
+
+- 정합성 고도화(동시성 제어) : 
+view_count = view_count + 1
+이라서 Lost Update 문제는 없음
+하지만 Redis + Batch로 가면 고려해야 할 것 = 
+스케줄러 중복 실행 방지
+배치 중 실패 시 재처리 전략
+Redis → DB 반영 후 Redis 초기화
+
+- 중복 조회 방지 (한 IP당 한번만 조회수를 올릴 수 있게) : 여러번 증가 가능
+Redis key값 활용
+
+- 조회 이벤트 분리(이력 기반 설계) : 
+Redis → DB 반영을 이벤트 기반으로 바꾸는 방법?
+조회 발생 → ViewEvent 발행  → 조회수 집계  → 추천 알고리즘 → 사용자 행동 분석
+Kafka / RabbitMQ
+또는 단순 로그 테이블
+gpp_view_logs
+	- gpp_id
+	- user_id
+	- ip
+	- viewed_at
+
+-----------------------------------------------------------------------------------------------
+## 고도화 리스트 (미정, 상세 내용은 일치하지 않음)
+부하테스트 툴?
+엔그라인더, k6
+기존 성능 측정(포스트맨으로 측정해도 Ok, 다만 상황에 맞게) -> 문제 발견 -> 원인 분석 -> 개선 방법(리스트업) -> 의사 결정 -> 문제 해결 (기록)
+
+0. 일괄 Update
+모집 상태 (prograssStatus)는 마감일 기준으로 일괄 배치 (스케줄러?)
+시작일/종료일에 따라 모집상태가 일괄적으로 바뀌도록 코드 수정
+시작일/종료일이 동일한 공동구매 게시물 여러개 생성 후 테스트
+혹은 다른 일괄적으로 Update되는 기능을 찾거나 추가
+-> 이후 해당 공동구매게시물을 팔로우한 사용자에게 알림 발송? 확장가능
+
+1. viewCount 고도화 - 캐시 적용(일괄 업뎃) + 동시성 제어 (이미 해결된건지 확인)
+스케줄러 -> DB에 일괄 업데이트(Batch Update)
+Write-Back 패턴: 조회수를 Redis에서 먼저 증가시키고, 일정 시간마다 스케줄러를 통해 DB에 일괄 업데이트
+
+동시성 제어
+스레드 a, 스레드 b 동시접근 -> 2가 안오르고 1이 오름
+"원자적으로 작동하는지"
+-> 부하 테스트 : 응답 시간 총 N개의 요청이 들어왔을때, 모든 요청을 끝내는 시간 등
+
+1. viewCount 고도화
+- 중복 조회 방지 : 
+Redis key값 활용
+- Redis 캐싱 + 비동기 반영(트래픽 대응) :  
+조회할 때마다 DB 반영은 비용적으로 문제
+요청이 들어오면 Redis INCR 처리 후 즉시 응답 -> 스케줄러로 주기적 일괄 반영
+장애 시 Redis 데이터 유실 가능, 그렇기 때문에 중요한 정보가 아닌 조회수에 적용함
+
+- 조회수 + 랭킹 분리 : 
+아래처럼 분리한다
+실시간 조회수 -> Redis
+누적 조회수 -> DB
+랭킹 -> Redis Sorted Set (DB 조회 없이 랭킹 페이지 구현 가능)
+
+- 정합성 고도화(동시성 제어) : 
+view_count = view_count + 1
+이라서 Lost Update 문제는 없음
+하지만 Redis + Batch로 가면 고려해야 할 것:
+스케줄러 중복 실행 방지
+배치 중 실패 시 재처리 전략
+Redis → DB 반영 후 Redis 초기화
+
+##### 아래는 안할거같음
+- 조회 이벤트 분리(이력 기반 설계) : 
+조회 발생
+ → ViewEvent 발행
+   → 조회수 집계
+   → 추천 알고리즘
+   → 사용자 행동 분석
+Kafka / RabbitMQ
+또는 단순 로그 테이블
+gpp_view_logs
+	- gpp_id
+	- user_id
+	- ip
+	- viewed_at
+
+비관적 락, 낙관적 락은 조회수같은 트래픽이 높은 곳엔 부적합함
+
+
+2. 모든 쿼리 고도화 - QueryDsl, Indexing(마이그레이션툴도?)
+QueryDsl은 할 필요성을 찾지못함
+쿼리가 실제로 어떻게 발생하는지 실행 계획을 뽑아보고 분석
+동적 쿼리: Querydsl을 도입
+인덱싱 전략: 특정 조건(예: category + gppProgressStatus)으로 검색이 잦다면, DB 복합 인덱스(Composite Index)를 설정하고 실행 계획(Explain)을 분석하여 성능이 얼마나 개선되었는지 수치화
+목록 조회는 DTO Projection으로 최적화?
+MySql prefix % 인덱싱 적용안됨
+역인덱싱
+문서화
+1. 본인이 인덱싱을 적용하기로 한 도메인 대상 지정
+2. 해당 도메인의 모든 Repository 레이어의 쿼리메서드를 리스트업
+3. 각 쿼리메서드 분석(의미, 실제 SQL이 어떻게 나가는지)
+4. 인덱싱 타깃 설정, 이유(근거)
+5. 실제 적용
+6. 전후 비교
+
+
+3. 알림(메세지 큐를 쓴다면 - 비동기같은거 다룰 수 있다) - Spring Events, @Async(혹은 카프카?)
+도메인간의 결합도를 낮추기
+이벤트 기반 설계: 인플루언서가 새로운 공동구매를 등록했을 때, 팔로워들에게 알림을 보내는 로직을 Service에 직접 넣지 않고 ApplicationEventPublisher를 사용해 분리
+비동기 처리: 알림 전송과 같은 부가 작업은 @Async를 통해 비동기로 처리하여 메인 로직(게시물 생성)의 응답 시간을 단축
+
+
+
++ 소켓통신(채팅)
+
+
+
+모집상태 대기상태가 있으면 더 좋겠다
+
+모니터링 툴 apm - pinpoint?
+
+-----------------------------------------------------------------------------------------------
+1. https://chatgpt.com/s/t_6978bc55affc8191a24ca92086aeb20c
+2. https://chatgpt.com/s/t_6978be003a408191ae445c04fd8cb365
+
+### 1) DB 마이그레이션 도입 + 인덱싱 최적화 (Flyway/Liquibase)
+지금 구조는 ddl-auto 기반으로 보이는데 → 실무에선 거의 마이그레이션 기반으로 감
+“인덱스 추가”를 단순히 DB에서 치는게 아니라 버전 관리로 남길 수 있음
+
+적용하면 좋은 인덱스 후보
+group_purchase_posts(deleted_at) : 조회조건 항상 붙음
+group_purchase_posts(created_at) : 목록 정렬
+group_purchase_posts(user_id) : 작성자 기반 조회/권한 검증
+검색 기능 있으면
+product_name (LIKE 검색 최적화는 한계 있지만 그래도 도움)
+user.nickname 검색이면 nickname 인덱스
+
+Flyway로 운영환경 스키마 변경을 안전하게 관리, 조회 패턴 기반 인덱싱으로 성능 개선
+
+### 2) 조회수 시스템 고도화 (Redis + 비동기 Flush)
+지금은 UPDATE view_count = view_count + 1 방식이라 동시성은 안전하지만,
+트래픽 많아지면 DB Update가 병목
+“중복 조회(새로고침)” 방지 없음
+
+V3 개선 방향
+조회수는 Redis에서 INCR
+유저/세션 단위로 중복 조회 제한(예: 10분)
+SETNX view:{postId}:{userId} TTL
+일정 주기로 DB에 반영 (Scheduler or Batch)
+
+📌 어필 포인트
+“조회수는 Redis로 분리하여 DB 부하를 줄이고, 중복 조회 방지 및 배치 반영 구조로 고도화했습니다.”
+
+### 3) 검색 기능 고도화 (QueryDSL + 동적조건 + 페이징 최적화)
+지금 @Query에 조건 분기 문자열로 처리 중인데 유지보수/확장성이 약해요.
+
+V3 개선 포인트
+QueryDSL로
+- keyword null 처리
+- searchCondition enum화
+- 정렬 조건 확장(최신순/조회순/마감임박순)
+목록 조회는 DTO Projection으로 최적화
+
+📌 어필 포인트
+“QueryDSL 기반 동적 검색/정렬을 구현하고, Projection으로 필요한 필드만 조회해 성능을 개선했습니다.”
+
+### 4) N+1 방지 + 성능 튜닝 (Fetch Join / EntityGraph / BatchSize)
+GroupPurchasePost는 user를 LAZY로 두고 있는데,
+목록 조회에서 user.nickname 같은 걸 쓰면 N+1 터질 가능성이 높음.
+
+V3 개선 방향
+목록/검색 쿼리에서 fetch join
+또는 @EntityGraph(attributePaths = "user")
+다대일은 fetch join이 특히 효과 큼
+
+📌 어필 포인트
+“N+1 문제를 재현하고 Fetch Join/EntityGraph로 해결했습니다.”
+
+### 5) Soft Delete 고도화 (Hibernate @SQLDelete + @Where)
+현재는 “조회할 때마다 deletedAt is null 조건”을 직접 넣고 있어요.
+
+V3 개선 방향
+@SQLDelete(sql = "UPDATE ... SET deleted_at = now() WHERE id = ?")
+@Where(clause = "deleted_at is null")
+공통 필터로 깔끔하게 처리 가능
+
+📌 어필 포인트
+“Soft Delete를 ORM 레벨에서 일관되게 적용해 실수 가능성을 줄였습니다.”
+
+Flyway + 인덱싱
+Redis 조회수 캐싱/중복방지 + 배치 반영
+QueryDSL 검색 고도화 + Projection
+
+추천하는 “측정 조합” 베스트
+✅ 최소 구성 (빠르게 근거 만들기)
+k6 (부하 테스트)
+MySQL EXPLAIN (인덱스 근거)
+p6spy (쿼리 횟수/N+1 근거)
+→ 이 3개만 해도 “고도화 근거” 충분
+
+
+

@@ -1,0 +1,75 @@
+temp <- 먼저 다 때려박는 이유 : 고아 이미지를 모아서 휴지통 비우기
+
+요청 -> 이미지를 temp에 넣음
+-> 호출된 서비스의 `트랜잭션 성공` 여부 채크 if
+--> 성공이면 : temp에 넣은 해당 이미지를 /user 등으로 이동
+--> 거짓이면 : temp에 그대로 둠
+-> 그리고 일정 주기로 temp를 비워줌 (라이프 사이클)
+
+
+// 1. 무조건 temp 업로드
+String tempKey = s3Service.uploadToTemp(file);
+
+// 2. DB 트랜잭션 (이미지 key만 저장)
+GroupPurchasePost post = repository.save(...);
+
+// 3. 트랜잭션 성공 후
+@TransactionalEventListener(phase = AFTER_COMMIT)
+public void confirmImage(PostCreatedEvent event) {
+    s3Service.move(
+        event.getTempKey(), <--- 대상 특정하기
+        "post/" + event.getPostId() + "/cover.jpg" <--- 경로
+    );
+}
+
+---
+
+### 흐름 요약?
+[Client]
+   ↓
+[temp 업로드]
+   ↓
+[DB 트랜잭션]
+   ↓ (성공)
+[AFTER_COMMIT]
+   ↓
+[temp → post/{id}/]
+
+---
+
+### S3Service - 내부 메서드
+- uploadToTemp(MultipartFile file)
+- move(String sourceKey, String targetKey)
+- deleteByPrefix(String prefix)
+
+### PostImageConfirmedEvent - 도메인 이벤트
+    private Long postId;
+    private String tempKey;
+
+### 해당 서비스를 호출하는 쪽
+1. 이미지 먼저 temp 업로드
+2. DB 저장 (tempKey는 DB에 저장 x)
+3. 트랜잭션 성공 후 이미지 확정 이벤트 발행
+
+### PostImageEventListener - 커밋 성공 후를 감지하는 리스너 클래스
+- @Component, @RequiredArgsConstructor
+- @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+- s3Service.move(event.getTempKey(), targetKey); 호출
+
+### 해당 서비스에서 실제 삭제를 호출하는 쪽
+- gpPostDelete(Long postId, ...)
+// AFTER_COMMIT에서 처리
+    eventPublisher.publishEvent(new PostDeletedEvent(postId)
+
+@EventListener
+@TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+public void deletePostImages(PostDeletedEvent event) {
+    s3Service.deleteByPrefix("post/" + event.getPostId() + "/");
+}
+
+
+
+
+
+
+
